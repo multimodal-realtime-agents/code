@@ -1,7 +1,11 @@
 from google.adk.agents import Agent
 from google.genai import types
 
-MODEL = "gemini-2.0-flash-exp" #"gemini-2.5-flash"
+import os
+from dotenv import load_dotenv
+load_dotenv(os.path.join(os.path.dirname(__file__), '../../../../.env'))
+
+MODEL = os.getenv("MODEL", "gemini-2.0-flash-exp")
 
 def add(numbers: list[int]) -> int:
   """Calculates the sum of a list of integers.

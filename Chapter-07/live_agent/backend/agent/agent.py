@@ -10,7 +10,11 @@ from .sub_agents.agent_summary.agent import agent_summary
 
 from .context import context
 
-MODEL = "gemini-2.5-flash"
+import os
+from dotenv import load_dotenv
+load_dotenv(os.path.join(os.path.dirname(__file__), '../../../../.env'))
+
+MODEL = os.getenv("MODEL", "gemini-2.5-flash")
 
 async def callback_before_agent(callback_context: CallbackContext) -> Optional[types.Content]:
     """

@@ -8,7 +8,11 @@ from typing import Optional
 from .tools import check_grammar
 from .prompt import instruction_prompt
 
-MODEL = "gemini-2.5-flash"
+import os
+from dotenv import load_dotenv
+load_dotenv(os.path.join(os.path.dirname(__file__), '../../../../.env'))
+
+MODEL = os.getenv("MODEL", "gemini-2.5-flash")
 
 def callback_before_agent(callback_context: CallbackContext) -> Optional[types.Content]:
   # Guardrail 1: Do we have the student profile?

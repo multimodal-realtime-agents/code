@@ -8,7 +8,11 @@ from .tools import add, subtract, multiply, divide
 from .prompt import instruction_prompt
 from .examples import examples
 
-MODEL = "gemini-2.5-flash"
+import os
+from dotenv import load_dotenv
+load_dotenv(os.path.join(os.path.dirname(__file__), '../../../../../../.env'))
+
+MODEL = os.getenv("MODEL", "gemini-2.5-flash")
 
 async def callback_before_agent(callback_context: CallbackContext) -> Optional[types.Content]:
         # Guardrail 1: Do we have the student profile?
