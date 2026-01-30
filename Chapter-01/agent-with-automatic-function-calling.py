@@ -183,12 +183,15 @@ def print_history(chat):
 # --- Main Execution Block ---
 # This is the entry point of the script.
 if __name__ == '__main__':
-    GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT") # The Google Cloud Project
-    LOCATION = os.getenv("GOOGLE_CLOUD_LOCATION", "us-central1") # The location of execution e.g. "us-central1"
+    GOOGLE_GENAI_USE_VERTEXAI = os.getenv("GOOGLE_GENAI_USE_VERTEXAI") # The Google Cloud Project
     
-    MODEL = os.getenv("MODEL", "gemini-2.5-flash") # The model ID for the example
-
-    client = genai.Client(vertexai=True, project=GOOGLE_CLOUD_PROJECT, location=LOCATION)
+    if(GOOGLE_GENAI_USE_VERTEXAI=="1"):
+        GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT") # The Google Cloud Project
+        LOCATION = os.getenv("GOOGLE_CLOUD_LOCATION", "us-central1") # The location of execution e.g. "us-central1"
+        client = genai.Client(vertexai=True, project=GOOGLE_CLOUD_PROJECT, location=LOCATION)
+    else:
+        GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+        client = genai.Client(vertexai=False, api_key=GOOGLE_API_KEY)
 
     instruction_prompt = """You are a specialized math assistant. Your sole purpose is to solve arithmetic problems involving addition, subtraction, multiplication, and division. Handle multi-step calculations and number ranges. Decline all non-mathematical requests."""
    

@@ -12,9 +12,22 @@ The examples demonstrate the evolution of AI agents from simple text generation 
 ## How to Run
 
 ### Prerequisites
-1.  **Google Cloud Project**: You need a Google Cloud Project with the Vertex AI API enabled.
-2.  **Environment Variables**: Create a `.env` file in the **root of the repository** (or in this folder) with the following:
+You can run these examples using either **Google AI Studio (API Key)** or **Vertex AI (Google Cloud)**.
+
+1.  **Environment Variables**: Create a `.env` file in the **root of the repository** (or in this folder) based on your chosen method:
+
+    **Option A: Google AI Studio (Recommended for individuals)**
+    *   Get an API key from [aistudio.google.com](https://aistudio.google.com/).
     ```env
+    GOOGLE_GENAI_USE_VERTEXAI=0
+    GOOGLE_API_KEY=your-api-key-here
+    MODEL=gemini-2.5-flash
+    ```
+
+    **Option B: Vertex AI (Recommended for enterprise/production)**
+    *   Requires a Google Cloud Project with Vertex AI API enabled.
+    ```env
+    GOOGLE_GENAI_USE_VERTEXAI=1
     GOOGLE_CLOUD_PROJECT=your-project-id
     GOOGLE_CLOUD_LOCATION=us-central1
     MODEL=gemini-2.5-flash
