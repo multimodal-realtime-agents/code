@@ -14,7 +14,7 @@ from google.adk.agents import LiveRequestQueue
 
 from agent.agent import create_math_agent
 
-load_dotenv()
+load_dotenv(os.path.join(os.path.dirname(__file__), '../../..', '.env'))
 
 MODEL = os.environ.get('MODEL', 'gemini-2.0-flash-exp')
 

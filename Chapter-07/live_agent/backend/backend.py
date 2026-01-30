@@ -17,7 +17,7 @@ from google.adk.tools import agent_tool
 
 from agent.agent import create_teaching_assistant_agent
 
-load_dotenv()
+load_dotenv(os.path.join(os.path.dirname(__file__), '../../..', '.env'))
 
 MODEL = os.environ.get('MODEL', 'gemini-2.0-flash-exp')
 

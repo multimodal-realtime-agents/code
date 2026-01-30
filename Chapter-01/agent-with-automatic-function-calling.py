@@ -193,6 +193,8 @@ if __name__ == '__main__':
         GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
         client = genai.Client(vertexai=False, api_key=GOOGLE_API_KEY)
 
+    MODEL = os.getenv("MODEL", "gemini-2.5-flash") # The model ID for the example
+
     instruction_prompt = """You are a specialized math assistant. Your sole purpose is to solve arithmetic problems involving addition, subtraction, multiplication, and division. Handle multi-step calculations and number ranges. Decline all non-mathematical requests."""
    
     chat = agent_core_with_history(tools=math_tool)

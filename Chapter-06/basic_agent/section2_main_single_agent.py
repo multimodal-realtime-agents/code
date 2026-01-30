@@ -11,7 +11,7 @@ from google.genai import types
 from agent_maths.agent import agent_math
 
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv(os.path.join(os.path.dirname(__file__), '../..', '.env'))
 
 # Get the model ID from the environment variable
 MODEL = os.getenv("MODEL", "gemini-2.5-flash") # The model ID for the agent

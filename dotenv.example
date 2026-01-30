@@ -1,13 +1,17 @@
-# Rename as .env and fill your value
-
-# Choose Model Backend: 0 -> ML Dev, 1 -> Vertex AI
+# General Configuration
+# Set to 0 to use Google AI Studio (API Key)
+# Set to 1 to use Vertex AI (Google Cloud Project)
 GOOGLE_GENAI_USE_VERTEXAI=1
 
-# Vertex AI backend config, uncomment and use
-#GOOGLE_CLOUD_PROJECT=FILL_YOUR_PROJECT_ID
-#GOOGLE_CLOUD_LOCATION=FILL_YOUR_LOCATION
+# Model Configuration
+# Common models: gemini-2.5-flash, gemini-2.0-flash-exp, gemini-1.5-flash
+MODEL=gemini-2.5-flash
 
-# ML Dev backend config, uncomment and use
-#GOOGLE_API_KEY=YOUR_AISTUDIO_API_KEY
+# --- Option A: Google AI Studio (API Key) ---
+# Required if GOOGLE_GENAI_USE_VERTEXAI=0
+GOOGLE_API_KEY=YOUR_API_KEY_HERE
 
-MODEL=FILL_THE_DEFAULT_MODEL
+# --- Option B: Vertex AI (Google Cloud) ---
+# Required if GOOGLE_GENAI_USE_VERTEXAI=1
+GOOGLE_CLOUD_PROJECT=YOUR_PROJECT_ID
+GOOGLE_CLOUD_LOCATION=us-central1

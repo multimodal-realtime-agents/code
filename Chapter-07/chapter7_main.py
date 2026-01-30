@@ -12,7 +12,7 @@ from google.genai import types
 from agent_teaching_assistant.agent import root_agent
 
 # Load environment variables from .env file
-load_dotenv()
+load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 # Configuration
 AGENT_APP_NAME = "teaching_assistant_app"
