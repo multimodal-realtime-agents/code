@@ -1,0 +1,99 @@
+{
+  "eval_set_id": "evalset6c75a0",
+  "name": "evalset6c75a0",
+  "eval_cases": [
+    {
+      "eval_id": "case88d1b0",
+      "conversation": [
+        {
+          "invocation_id": "e-1034b4f0-0db8-461c-91af-cbfc6316dfdf",
+          "user_content": {
+            "parts": [
+              {
+                "text": "hello"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "Hello! How can I help you with math today?\n"
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {},
+          "creation_timestamp": 1760348965.869543
+        },
+        {
+          "invocation_id": "e-a6829e8d-5b43-4d38-9af7-bc35223f6612",
+          "user_content": {
+            "parts": [
+              {
+                "text": "could you multiple number 2 and 3"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "The result of multiplying 2 and 3 is 6.\n"
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "invocation_events": [
+              {
+                "author": "agent_math",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "adk-767757f4-bcde-421f-b596-41c09b403c07",
+                        "args": {
+                          "numbers": [
+                            2,
+                            3
+                          ]
+                        },
+                        "name": "multiply"
+                      }
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "agent_math",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "adk-767757f4-bcde-421f-b596-41c09b403c07",
+                        "name": "multiply",
+                        "response": {
+                          "result": 6
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              }
+            ]
+          },
+          "creation_timestamp": 1760348978.89955
+        }
+      ],
+      "session_input": {
+        "app_name": "agent_maths",
+        "user_id": "user"
+      },
+      "creation_timestamp": 1760348995.425335
+    }
+  ],
+  "creation_timestamp": 1760348989.57483
+}

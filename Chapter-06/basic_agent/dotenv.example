@@ -1,0 +1,11 @@
+GOOGLE_GENAI_USE_VERTEXAI=FILL_0_or_1 # Set to 0 to use API key or 1 to use Vertex AI
+
+# API Configuration
+GOOGLE_API_KEY=<API Key> # Set if GOOGLE_GENAI_USE_VERTEXAI=0
+
+# Project Configuration
+GOOGLE_CLOUD_PROJECT=FILL_YOUR_PROJECT_ID
+GOOGLE_CLOUD_LOCATION=FILL_YOUR_LOCATION
+
+# Model Configuration
+MODEL=FILL_THE_DEFAULT_MODEL #e.g. gemini-2.0-flash-exp
