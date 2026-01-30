@@ -11,17 +11,17 @@ Discover how to securely integrate external tools and data sources using standar
 ## Book Chapters
 
 ### Part 1: Foundations of Modern AI Systems
-1. Intelligent Agents and Collaborative AI
+1. [Intelligent Agents and Collaborative AI](Chapter-01)
 2. Understanding Multimodality: Beyond Text
 
 ### Part 2: Building Live, Interactive Experiences with Real-Time Multimodal APIs
-3. Architecting for Real-Time AI Interaction
-4. Advanced Live Interactions: Video, Tools, and System Instructions
+3. [Architecting for Real-Time AI Interaction](Chapter-03)
+4. [Advanced Live Interactions: Video, Tools, and System Instructions](Chapter-04)
 
 ### Part 3: Architecting and Implementing Agentic Systems
 5. Core Components of an Agent Framework (theoretical only)
-6. Designing and Building Agents (Illustrated with ADK)
-7. Multi-Agent Systems: Collaboration and Orchestration (Illustrated with ADK)
+6. [Designing and Building Agents (Illustrated with ADK)](Chapter-06)
+7. [Multi-Agent Systems: Collaboration and Orchestration (Illustrated with ADK)](Chapter-07)
 
 ### Part 4: Enabling Interoperability with Open Protocols
 8. The Agent2Agent (A2A) Protocol: Enabling Agent-to-Agent Communication
