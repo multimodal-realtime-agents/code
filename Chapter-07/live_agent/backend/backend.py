@@ -19,7 +19,11 @@ from agent.agent import create_teaching_assistant_agent
 
 load_dotenv(os.path.join(os.path.dirname(__file__), '../../..', '.env'))
 
-MODEL = os.environ.get('MODEL', 'gemini-2.0-flash-exp')
+GOOGLE_GENAI_USE_VERTEXAI = os.environ.get("GOOGLE_GENAI_USE_VERTEXAI")
+if(GOOGLE_GENAI_USE_VERTEXAI=="1"):
+    MODEL_LIVE = os.environ.get('MODEL_LIVE_VERTEX', 'gemini-live-2.5-flash-native-audio')
+else:
+    MODEL_LIVE = os.environ.get('MODEL_LIVE_API', 'gemini-2.5-flash-preview-native-audio-dialog')
 
 async def start_agent_session(root_agent, session_id: str, app_name="agent", user_id="user", context: Dict[str, Any]={}) -> Any: 
     """
@@ -31,7 +35,7 @@ async def start_agent_session(root_agent, session_id: str, app_name="agent", use
     voice = 'Aoede'
     language_code = 'en-GB'
 
-    print(f"""Live Agent Configuration: [MODEL: {MODEL}, Voice: {voice}, Modalities: {response_modalities_from_config}, Language: {language_code}, Session ID: {session_id}""")
+    print(f"""Live Agent Configuration: [MODEL_LIVE: {MODEL_LIVE}, Voice: {voice}, Modalities: {response_modalities_from_config}, Language: {language_code}, Session ID: {session_id}""")
 
     run_config = RunConfig(
         response_modalities=response_modalities_from_config, 
@@ -127,17 +131,16 @@ async def handle_connections(client_ws, path=None):
     try:
         session_id = str(id(client_ws))
 
-        teaching_assistant_agent, context = create_teaching_assistant_agent(model=MODEL)
+        teaching_assistant_agent, context = create_teaching_assistant_agent()
 
         teaching_assistant_agent_tool = agent_tool.AgentTool(teaching_assistant_agent)
 
         agent_live = Agent(
-        model=MODEL,
+        model=MODEL_LIVE,
         name="agent_live",
         description="This agent is a live agent.",
         instruction="Listen to the user and use your tool to correct the grammar and answer the math question. You can answer only grammar and math questions for kids.",
         tools=[teaching_assistant_agent_tool],
-        #sub_agents=[teaching_assistant_agent],
         generate_content_config=types.GenerateContentConfig(temperature=0.2),
         )        
         
