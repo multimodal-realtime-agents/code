@@ -27,7 +27,7 @@ This chapter extends the real-time foundation built in Chapter 3 to include more
 ### 1. Start the Advanced Proxy
 ```bash
 cd backend/proxy
-pip install -r requirements.txt
+pip install -r ../../../requirements.txt
 python proxy.py
 ```
 *The proxy will start on `localhost:8081`.*

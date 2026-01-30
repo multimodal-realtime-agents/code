@@ -1,3 +1,0 @@
-websockets
-google-genai
-python-dotenv

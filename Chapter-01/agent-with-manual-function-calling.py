@@ -333,7 +333,7 @@ def send_user_query(query: str):
 # This is the entry point of the script.
 if __name__ == '__main__':
 
-    GOOGLE_GENAI_USE_VERTEXAI = os.getenv("GOOGLE_GENAI_USE_VERTEXAI") # The Google Cloud Project
+    GOOGLE_GENAI_USE_VERTEXAI = os.getenv("GOOGLE_GENAI_USE_VERTEXAI")
     
     if(GOOGLE_GENAI_USE_VERTEXAI=="1"):
         GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT") # The Google Cloud Project

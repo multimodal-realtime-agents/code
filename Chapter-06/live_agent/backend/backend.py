@@ -16,7 +16,11 @@ from agent.agent import create_math_agent
 
 load_dotenv(os.path.join(os.path.dirname(__file__), '../../..', '.env'))
 
-MODEL = os.environ.get('MODEL', 'gemini-2.0-flash-exp')
+GOOGLE_GENAI_USE_VERTEXAI = os.environ.get("GOOGLE_GENAI_USE_VERTEXAI")
+if(GOOGLE_GENAI_USE_VERTEXAI=="1"):
+    MODEL_LIVE = os.environ.get('MODEL_LIVE_VERTEX', 'gemini-live-2.5-flash-native-audio')
+else:
+    MODEL_LIVE = os.environ.get('MODEL_LIVE_API', 'gemini-2.5-flash-preview-native-audio-dialog')
 
 async def start_agent_session(root_agent, session_id: str, app_name="agent_math", user_id="user", context: Dict[str, Any]={}) -> Any: 
     """
@@ -28,7 +32,7 @@ async def start_agent_session(root_agent, session_id: str, app_name="agent_math"
     voice = 'Aoede'
     language_code = 'en-GB'
 
-    print(f"""Live Agent Configuration: [MODEL: {MODEL}, Voice: {voice}, Modalities: {response_modalities_from_config}, Language: {language_code}, Session ID: {session_id}""")
+    print(f"""Live Agent Configuration: [MODEL_LIVE: {MODEL_LIVE}, Voice: {voice}, Modalities: {response_modalities_from_config}, Language: {language_code}, Session ID: {session_id}""")
 
     run_config = RunConfig(
         response_modalities=response_modalities_from_config, 
@@ -123,7 +127,7 @@ async def handle_connections(client_ws, path=None):
 
     try:
         session_id = str(id(client_ws))
-        root_agent, context = create_math_agent(model=MODEL)
+        root_agent, context = create_math_agent(model=MODEL_LIVE)
         
         live_events, live_request_queue = await start_agent_session(root_agent, session_id, app_name="agent_math", user_id="user", context=context)
 

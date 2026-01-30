@@ -11,7 +11,14 @@ MODEL=gemini-2.5-flash
 # Required if GOOGLE_GENAI_USE_VERTEXAI=0
 GOOGLE_API_KEY=YOUR_API_KEY_HERE
 
+# Live Model Configuration if GOOGLE_GENAI_USE_VERTEXAI=0
+#MODEL_LIVE_API=gemini-2.5-flash-preview-native-audio-dialog #gemini-2.0-flash-live-001, gemini-live-2.5-flash-preview, gemini-2.5-flash-native-audio-preview-09-2025, gemini-2.5-flash-preview-native-audio-dialog, gemini-2.5-flash-exp-native-audio-thinking-dialog
+
+
 # --- Option B: Vertex AI (Google Cloud) ---
 # Required if GOOGLE_GENAI_USE_VERTEXAI=1
 GOOGLE_CLOUD_PROJECT=YOUR_PROJECT_ID
 GOOGLE_CLOUD_LOCATION=us-central1
+
+# Live Model Configuration if GOOGLE_GENAI_USE_VERTEXAI=1
+MODEL_LIVE_VERTEX=gemini-live-2.5-flash-native-audio #gemini-live-2.5-flash-native-audio # gemini-live-2.5-flash-preview-native-audio, gemini-live-2.5-flash-preview-native-audio-09-17

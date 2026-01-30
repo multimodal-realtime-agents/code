@@ -28,7 +28,7 @@ This chapter introduces the fundamental architecture for building real-time, bid
 The proxy handles the audio stream and connection to Gemini.
 ```bash
 cd backend/proxy
-pip install -r requirements.txt
+pip install -r ../../../requirements.txt
 python proxy.py
 ```
 *The proxy will start on `localhost:8081`.*

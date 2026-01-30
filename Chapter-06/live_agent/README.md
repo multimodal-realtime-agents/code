@@ -4,7 +4,7 @@ Follow these steps to run the application locally:
 
    Install dependencies that include [Agent Development Kit](https://google.github.io/adk-docs/):
    ```bash
-   pip install -r requirements.txt
+   pip install -r ../../requirements.txt
    ```
 
 2. **Configure Environment Variables:**

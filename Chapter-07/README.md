@@ -23,7 +23,7 @@ This chapter tackles the complexity of systems where multiple agents must work t
 ### Installation
 Install the Google Agent Development Kit and other dependencies:
 ```bash
-pip install google-adk google-genai python-dotenv
+pip install -r ../requirements.txt
 ```
 
 ### Execution
