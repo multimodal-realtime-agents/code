@@ -10,7 +10,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv(os.path.join(os.path.dirname(__file__), '../../../../.env'))
 
-MODEL = os.getenv("MODEL", "gemini-2.0-flash-exp")
+MODEL = os.getenv("MODEL", "gemini-2.5-flash")
 
 def create_math_agent(model=MODEL):
     context["examples"] = examples

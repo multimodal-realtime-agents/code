@@ -5,7 +5,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv(os.path.join(os.path.dirname(__file__), '../../../../.env'))
 
-MODEL = os.getenv("MODEL", "gemini-2.0-flash-exp")
+MODEL = os.getenv("MODEL", "gemini-2.5-flash")
 
 def add(numbers: list[int]) -> int:
   """Calculates the sum of a list of integers.
@@ -113,7 +113,6 @@ def divide(numbers: list[int]) -> float:  # Use float for division
         result /= num
     return result
 
-#print("Model:" + MODEL)
 agent_math = Agent(
     model=MODEL,
     name="agent_math",
