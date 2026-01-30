@@ -7,15 +7,39 @@ This chapter introduces the fundamental architecture for building real-time, bid
 
 ## Contents
 ### `backend/`
-- **`server.py`**: A lightweight proxy server that handles cross-origin (CORS) requests and serves the frontend application. It acts as the bridge between the browser client and the backend processing logic (conceptually).
+- **`server.py`**: A simple HTTP server that serves the frontend and handles CORS.
+- **`proxy/`**: Contains the WebSocket proxy server (`proxy.py`) that connects to the Gemini API.
 
 ### `frontend/`
-- **`index.html`**: The user interface for the real-time agent, featuring microphone controls and status indicators.
-- **`app.js`**: Core application logic managing the AudioContext, WebSocket connections, and UI state.
-- **`audio-processor.js`**: An AudioWorkletProcessor that handles raw audio generation and processing in a dedicated thread to ensure glitch-free audio processing.
-- **`audio-streamer.js`**: Handles the buffering and scheduling of incoming audio chunks from the AI agent to play them back smoothly to the user.
+- **`index.html`**, **`app.js`**: The client application.
 
-## Key Concepts
-- **AudioWorklets**: Using modern Web Audio API for low-latency audio processing.
-- **Bidirectional Streaming**: Full-duplex communication for natural turn-taking.
-- **PCM Audio**: Handling raw 16-bit PCM audio streams.
+## How to Run
+
+### Prerequisites
+1.  **Google Cloud Project**: Ensure Vertex AI API is enabled.
+2.  **Environment Variables**: Create a `.env` file in `backend/proxy/` or the root:
+    ```env
+    GOOGLE_CLOUD_PROJECT=your-project-id
+    GOOGLE_CLOUD_LOCATION=us-central1
+    MODEL=gemini-2.5-flash
+    ```
+
+### 1. Start the WebSocket Proxy
+The proxy handles the audio stream and connection to Gemini.
+```bash
+cd backend/proxy
+pip install -r requirements.txt
+python proxy.py
+```
+*The proxy will start on `localhost:8081`.*
+
+### 2. Start the Frontend Server
+In a new terminal window, serve the frontend files.
+```bash
+cd backend
+python server.py
+```
+*The server will start on `localhost:8000`.*
+
+### 3. Usage
+Open your browser to [http://localhost:8000](http://localhost:8000). Click the microphone button to start the session and talk to the agent.

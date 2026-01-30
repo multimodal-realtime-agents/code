@@ -6,10 +6,33 @@ This folder contains the code examples for **Chapter 1: Intelligent Agents and C
 The examples demonstrate the evolution of AI agents from simple text generation to active entities capable of executing code and calling functions. We explore both manual and automatic function calling mechanisms using the Gemini API.
 
 ## Contents
-- **`agent-with-automatic-function-calling.py`**: A clean, modern implementation of an agent that uses Gemini's automatic function calling capability. The model decides when to call tools (math functions), and the library handles the execution and history management.
-- **`agent-with-manual-function-calling.py`**: A deep-dive implementation showing the "under the hood" mechanics of function calling. It explicitly defines the `FunctionDeclaration`, handles the tool loop, executes Python functions based on model requests, and manages the conversation history manually.
+- **`agent-with-automatic-function-calling.py`**: A clean, modern implementation of an agent that uses Gemini's automatic function calling capability.
+- **`agent-with-manual-function-calling.py`**: A deep-dive implementation showing the "under the hood" mechanics of function calling.
 
-## Key Concepts
-- **Tools**: Collections of functions (add, subtract, multiply, divide) provided to the model.
-- **Function Calling**: How the model "asks" to execute code instead of just generating text.
-- **Agent Loop**: The cycle of User Input -> Model decision -> Tool Execution -> Model Response.
+## How to Run
+
+### Prerequisites
+1.  **Google Cloud Project**: You need a Google Cloud Project with the Vertex AI API enabled.
+2.  **Environment Variables**: Create a `.env` file in the **root of the repository** (or in this folder) with the following:
+    ```env
+    GOOGLE_CLOUD_PROJECT=your-project-id
+    GOOGLE_CLOUD_LOCATION=us-central1
+    MODEL=gemini-2.5-flash
+    ```
+
+### Installation
+Install the required Python packages:
+```bash
+pip install google-genai python-dotenv
+```
+
+### Execution
+Run the automatic function calling example:
+```bash
+python agent-with-automatic-function-calling.py
+```
+
+Run the manual function calling example:
+```bash
+python agent-with-manual-function-calling.py
+```

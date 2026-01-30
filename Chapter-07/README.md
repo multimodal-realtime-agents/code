@@ -6,13 +6,29 @@ This folder contains the code examples for **Chapter 7: Multi-Agent Systems: Col
 This chapter tackles the complexity of systems where multiple agents must work together. It demonstrates orchestration patterns, delegation, and how to build a "Teaching Assistant" system composed of specialized sub-agents.
 
 ## Contents
-- **`chapter7_main.py`**: The main entry point for the orchestrated system. It initializes the `root_agent` and manages the user session loop.
-- **`agent_teaching_assistant/`**: Contains the logic for the specific agents in this system (e.g., a root dispatcher, a math specialist, a quiz generator).
-- **`section1_main_basic.py`**: Basic example of multi-agent setup.
-- **`section2_main_single_agent.py`**: Single agent baseline for comparison.
-- **`sectionbonus_agent_deployment.py`**: Advanced topics on deploying multi-agent systems.
+- **`chapter7_main.py`**: The orchestrator script.
+- **`agent_teaching_assistant/`**: The multi-agent definitions.
 
-## Key Concepts
-- **Orchestration**: A central agent routing tasks to sub-agents.
-- **Handoffs**: Transferring control from one agent to another.
-- **Specialization**: Designing agents with narrow, deep expertise (e.g., "Math Agent" vs "History Agent").
+## How to Run
+
+### Prerequisites
+1.  **Google Cloud Project**: Ensure Vertex AI API is enabled.
+2.  **Environment Variables**: Create a `.env` file in this directory:
+    ```env
+    GOOGLE_CLOUD_PROJECT=your-project-id
+    GOOGLE_CLOUD_LOCATION=us-central1
+    MODEL=gemini-2.5-flash
+    ```
+
+### Installation
+Install the Google Agent Development Kit and other dependencies:
+```bash
+pip install google-adk google-genai python-dotenv
+```
+
+### Execution
+Run the main teaching assistant orchestration example:
+```bash
+python chapter7_main.py
+```
+*This will start the multi-agent system and run through the predefined conversation flow.*

@@ -7,14 +7,38 @@ This chapter extends the real-time foundation built in Chapter 3 to include more
 
 ## Contents
 ### `backend/`
-- **`server.py`**: The proxy server facilitating the connection.
+- **`server.py`**: A simple HTTP server for the frontend.
+- **`proxy/`**: The advanced WebSocket proxy (`proxy.py`) supporting tools and video.
 
 ### `frontend/`
-- **`app.js`**: The client-side logic handling the WebSocket streaming.
-- **`audio-processor.js`**: Audio processing worklet.
-- **`audio-streamer.js`**: Audio playback handling.
+- **`app.js`**: Updated client logic for handling video frames and tool outputs.
 
-## Key Concepts
-- **Multimodal Inputs**: Processing audio and potentially video streams.
-- **Tool Integration**: Enabling the live agent to call functions dynamically.
-- **System Instructions**: Steering the agent's personality and constraints.
+## How to Run
+
+### Prerequisites
+1.  **Google Cloud Project**: Ensure Vertex AI API is enabled.
+2.  **Environment Variables**: Create a `.env` file in `backend/proxy/`:
+    ```env
+    GOOGLE_CLOUD_PROJECT=your-project-id
+    GOOGLE_CLOUD_LOCATION=us-central1
+    MODEL=gemini-2.5-flash
+    ```
+
+### 1. Start the Advanced Proxy
+```bash
+cd backend/proxy
+pip install -r requirements.txt
+python proxy.py
+```
+*The proxy will start on `localhost:8081`.*
+
+### 2. Start the Frontend Server
+In a new terminal window:
+```bash
+cd backend
+python server.py
+```
+*The server will start on `localhost:8000`.*
+
+### 3. Usage
+Open [http://localhost:8000](http://localhost:8000). You may need to grant camera permissions if video is enabled. Start the session and try asking the agent questions that require visual context or tool usage.
