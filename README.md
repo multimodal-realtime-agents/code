@@ -25,12 +25,12 @@ Discover how to securely integrate external tools and data sources using standar
 
 ### Part 4: Enabling Interoperability with Open Protocols
 8. The Agent2Agent (A2A) Protocol: Enabling Agent-to-Agent Communication
-9. Implementing A2A-Compliant Agents
+9. [Implementing A2A-Compliant Agents](Chapter-09)
 10. The Model Context Protocol (MCP): Standardizing Tool Interaction
-11. Implementing MCP-Enabled Agents and Tool Servers
+11. [Implementing MCP-Enabled Agents and Tool Servers](Chapter-11)
 
 ### Part 5: Synthesizing Live, Multi-Agent, Multi-Protocol Systems
-12. Reference Architecture: An Integrated System
+12. [Reference Architecture: An Integrated System](Chapter-12)
 13. Asynchronous Operations and Long-Running Tasks in the Integrated System
 14. Designing User Experience (UX) for the Integrated System
 

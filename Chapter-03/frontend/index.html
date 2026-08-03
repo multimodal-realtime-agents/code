@@ -1,20 +1,112 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Gemini Live Agent</title>
     <style>
-        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; }
-        #micButton.hot { background-color: #d93025; color: white; }
-        button { font-size: 1.2rem; padding: 10px 20px; margin-top: 20px; cursor: pointer; }
+      :root {
+        color-scheme: light;
+        font-family: Arial, sans-serif;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: #f7f8fa;
+        color: #1f2933;
+      }
+
+      main {
+        width: min(92vw, 520px);
+        display: grid;
+        gap: 18px;
+        text-align: center;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 700;
+      }
+
+      #status {
+        min-height: 1.5em;
+        margin: 0;
+        color: #4b5563;
+      }
+
+      button {
+        min-height: 56px;
+        border: 0;
+        border-radius: 8px;
+        padding: 0 24px;
+        background: #1f6feb;
+        color: white;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      button:disabled {
+        cursor: wait;
+        opacity: 0.65;
+      }
+
+      #micButton.hot {
+        background: #b42318;
+      }
+
+      .captions {
+        display: grid;
+        gap: 12px;
+        text-align: left;
+      }
+
+      .caption-block {
+        min-height: 72px;
+        border: 1px solid #d8dee8;
+        border-radius: 8px;
+        padding: 12px;
+        background: #ffffff;
+      }
+
+      .caption-block h2 {
+        margin: 0 0 8px;
+        font-size: 0.85rem;
+        color: #566174;
+      }
+
+      .caption-block p {
+        margin: 0;
+        line-height: 1.4;
+      }
+
+      .placeholder {
+        color: #7b8494;
+      }
     </style>
-</head>
-<body>
-    <h1>Gemini Live Agent</h1>
-    <p id="status">Ready. Click the button to start the session.</p>
-    <button id="micButton">Start Session</button>
+  </head>
+  <body>
+    <main>
+      <h1>Gemini Live Agent</h1>
+      <p id="status" role="status" aria-live="polite">Loading...</p>
+      <button id="micButton" type="button" disabled>Start Session</button>
+
+      <section class="captions" aria-label="Live captions">
+        <section class="caption-block" aria-labelledby="userCaptionLabel">
+          <h2 id="userCaptionLabel">You said</h2>
+          <p id="userCaption" class="placeholder" aria-live="polite">No speech yet.</p>
+        </section>
+        <section class="caption-block" aria-labelledby="assistantCaptionLabel">
+          <h2 id="assistantCaptionLabel">Assistant</h2>
+          <p id="assistantCaption" class="placeholder" aria-live="polite">No assistant speech yet.</p>
+        </section>
+      </section>
+    </main>
 
     <script type="module" src="app.js"></script>
-</body>
+  </body>
 </html>

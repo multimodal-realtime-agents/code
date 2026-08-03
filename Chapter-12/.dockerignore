@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.py[cod]
+.env
+.env.*
+!.env.example
+.pytest_cache/
+tests/
+deployment/
+VERIFICATION.md
+LIVE_API_ADK_RESEARCH.md
+UI_UX_SPEC.md
+UX_NOTES.md

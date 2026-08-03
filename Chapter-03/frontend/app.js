@@ -1,90 +1,230 @@
-import { AudioStreamer } from './audio-streamer.js';
+import { AudioStreamer } from "./audio-streamer.js";
+import { buildLiveWebSocketUrl, loadRuntimeConfig } from "./runtime-config.mjs";
+import { TranscriptTurns } from "./transcripts.mjs";
 
-// --- DOM Elements ---
-const statusElement = document.getElementById('status');
-const micButton = document.getElementById('micButton');
+const statusElement = document.querySelector("#status");
+const micButton = document.querySelector("#micButton");
+const userCaption = document.querySelector("#userCaption");
+const assistantCaption = document.querySelector("#assistantCaption");
 
-// --- State Management ---
+let socket = null;
+let connectPromise = null;
+let runtimeConfigPromise = null;
 let isSessionActive = false;
 let isMicMuted = false;
+let recorder = null;
 
-// --- Core Classes ---
 const streamer = new AudioStreamer();
+const transcripts = new TranscriptTurns();
 
-// --- WebSocket Setup ---
-const PROXY_URL = 'ws://localhost:8081';
-console.log('Attempting to connect to WebSocket proxy...');
-const ws = new WebSocket(PROXY_URL);
-
-ws.onopen = () => {
-    console.log('Connected to WebSocket proxy.');
-    statusElement.textContent = 'Ready. Click to start session.';
-    micButton.disabled = false;
-};
-
-ws.onmessage = async (event) => {
-    console.log('DEBUG: Raw message received:', event.data);
-    
-    try {
-        const response = JSON.parse(event.data);
-        console.log('DEBUG: Parsed message:', response);
-        
-        if (response.server_content?.interrupted) {
-            console.log('AI was interrupted. Stopping playback.');
-            streamer.stop();
-            statusElement.textContent = 'I was interrupted. Listening...';
-            return;
-        }
-
-        // Check for audio data in the correct location
-        if (response.server_content?.model_turn?.parts?.[0]?.inline_data?.data) {
-            console.log('DEBUG: Found audio data in response');
-            statusElement.textContent = 'Gemini is speaking...';
-            const audioData = response.server_content.model_turn.parts[0].inline_data.data;
-            console.log('DEBUG: Audio data length:', audioData.length);
-            await streamer.receiveAudioChunk(audioData);
-        }
-        
-        if (response.server_content?.turn_complete) {
-            console.log('DEBUG: Turn complete received');
-            statusElement.textContent = 'Listening...';
-        }
-        
-        if (response.server_content?.generation_complete) {
-            console.log('DEBUG: Generation complete received');
-        }
-        
-        if (response.setup_complete !== undefined) {
-            console.log('DEBUG: Setup complete received');
-        }
-        
-    } catch (error) {
-        console.error('DEBUG: Failed to parse message as JSON:', error);
-        console.error('DEBUG: Raw message was:', event.data);
-        console.error('DEBUG: Message type:', typeof event.data);
-        console.error('DEBUG: Message length:', event.data.length);
-        console.error('DEBUG: First 100 chars:', event.data.substring(0, 100));
+micButton.addEventListener("click", () => {
+    if (!isSessionActive) {
+        void startSession();
+    } else {
+        void toggleMute();
     }
-};
+});
 
-ws.onerror = (error) => {
-    console.error('WebSocket Error:', error);
-    statusElement.textContent = 'Error connecting. Please check the proxy server.';
-};
+window.addEventListener("beforeunload", () => {
+    closeSocket();
+    recorder.stop();
+    streamer.stop();
+});
 
-ws.onclose = (event) => {
-    console.log('WebSocket connection closed.', event.reason);
-    statusElement.textContent = 'Connection closed. Please refresh.';
+setStatus("Ready. Start a voice session.");
+micButton.disabled = false;
+
+async function startSession() {
     micButton.disabled = true;
-    if (isSessionActive) {
-        recorder.stop();
-        isSessionActive = false;
-    }
-};
+    setStatus("Starting microphone...");
+    clearCaptions();
 
-// --- Audio Recorder Class ---
+    try {
+        await streamer.ensureReady();
+        await recorder.start();
+        await recorder.resume();
+        recorder.unmute();
+        await connect();
+        isSessionActive = true;
+        isMicMuted = false;
+        socket.send(JSON.stringify({ type: "activity_start" }));
+        micButton.textContent = "Mute Mic";
+        micButton.classList.add("hot");
+        setStatus("Listening...");
+    } catch (error) {
+        recorder.stop();
+        streamer.stop();
+        isSessionActive = false;
+        isMicMuted = false;
+        setStatus(sessionStartErrorMessage(error));
+    } finally {
+        micButton.disabled = false;
+    }
+}
+
+async function toggleMute() {
+    micButton.disabled = true;
+    try {
+        if (isMicMuted) {
+            await recorder.resume();
+            recorder.unmute();
+            socket?.send(JSON.stringify({ type: "activity_start" }));
+            isMicMuted = false;
+            micButton.textContent = "Mute Mic";
+            micButton.classList.add("hot");
+            setStatus("Listening...");
+        } else {
+            recorder.mute();
+            transcripts.completeInputTurn();
+            socket?.send(JSON.stringify({ type: "activity_end" }));
+            isMicMuted = true;
+            micButton.textContent = "Unmute Mic";
+            micButton.classList.remove("hot");
+            setStatus("Mic muted.");
+        }
+    } catch (error) {
+        setStatus(error.message || "Could not update microphone state.");
+    } finally {
+        micButton.disabled = false;
+    }
+}
+
+async function connect() {
+    if (socket?.readyState === WebSocket.OPEN) return;
+    if (connectPromise) return connectPromise;
+
+    const config = await getRuntimeConfig();
+    const url = buildLiveWebSocketUrl(config.live_ws_url, createSessionId());
+    connectPromise = new Promise((resolve, reject) => {
+        const ws = new WebSocket(url);
+        socket = ws;
+
+        ws.addEventListener("open", () => {
+            if (socket !== ws) return;
+            connectPromise = null;
+            resolve();
+        });
+
+        ws.addEventListener("message", (event) => {
+            if (socket !== ws) return;
+            let message;
+            try {
+                message = JSON.parse(event.data);
+            } catch {
+                setStatus("Received an unreadable message from the proxy.");
+                return;
+            }
+            void handleMessage(message);
+        });
+
+        ws.addEventListener("close", (event) => {
+            if (socket !== ws) return;
+            socket = null;
+            connectPromise = null;
+            recorder.stop();
+            streamer.stop();
+            isSessionActive = false;
+            isMicMuted = false;
+            micButton.textContent = "Start Session";
+            micButton.classList.remove("hot");
+            if (event.code !== 1000) {
+                setStatus("Connection closed. Restart the proxy and refresh.");
+            }
+        });
+
+        ws.addEventListener("error", () => {
+            if (socket !== ws) return;
+            connectPromise = null;
+            reject(new Error("WebSocket connection failed."));
+        });
+    });
+
+    return connectPromise;
+}
+
+function getRuntimeConfig() {
+    if (!runtimeConfigPromise) {
+        runtimeConfigPromise = loadRuntimeConfig().catch((error) => {
+            runtimeConfigPromise = null;
+            throw error;
+        });
+    }
+    return runtimeConfigPromise;
+}
+
+async function handleMessage(message) {
+    if (message.type === "audio") {
+        setStatus("Gemini is speaking...");
+        await streamer.receiveAudioChunk(message.data, message.mime_type);
+    } else if (message.type === "input_transcript") {
+        setCaption(userCaption, transcripts.appendInput(message), "No speech yet.");
+    } else if (message.type === "output_transcript") {
+        setCaption(assistantCaption, transcripts.appendOutput(message), "No assistant speech yet.");
+    } else if (message.type === "text") {
+        setCaption(assistantCaption, transcripts.appendOutputText(message.text), "No assistant speech yet.");
+    } else if (message.type === "interrupted") {
+        streamer.stop();
+        setStatus("Interrupted. Listening...");
+    } else if (message.type === "turn_complete") {
+        transcripts.completeInputTurn();
+        transcripts.completeOutputTurn();
+        setStatus(isMicMuted ? "Mic muted." : "Listening...");
+    } else if (message.type === "go_away") {
+        setStatus("The live service asked this session to reconnect. Refresh if the connection closes.");
+    } else if (message.type === "error") {
+        setStatus(message.message || "Live session error.");
+    }
+}
+
+function closeSocket() {
+    if (socket?.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({ type: "activity_end" }));
+        socket.send(JSON.stringify({ type: "close" }));
+        socket.close(1000, "Page closed");
+    }
+}
+
+function setStatus(text) {
+    statusElement.textContent = text;
+}
+
+function clearCaptions() {
+    transcripts.reset();
+    setCaption(userCaption, "", "No speech yet.");
+    setCaption(assistantCaption, "", "No assistant speech yet.");
+}
+
+function setCaption(element, text, placeholder) {
+    const value = String(text || "").trim();
+    element.textContent = value || placeholder;
+    element.classList.toggle("placeholder", !value);
+}
+
+function sessionStartErrorMessage(error) {
+    if (error.name === "NotAllowedError") {
+        return "Microphone access was blocked. Allow microphone access, then start again.";
+    }
+    if (error.name === "NotFoundError") return "No microphone was found on this device.";
+    if (error.message?.includes("WebSocket")) {
+        return "Could not open the live WebSocket. Check that the Chapter 3 proxy is running.";
+    }
+    return error.message || "The voice session could not start.";
+}
+
+function createSessionId() {
+    return crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function arrayBufferToBase64(buffer) {
+    let binary = "";
+    const bytes = new Uint8Array(buffer);
+    for (const byte of bytes) binary += String.fromCharCode(byte);
+    return btoa(binary);
+}
+
 class AudioRecorder {
-    constructor() {
+    constructor({ onChunk }) {
+        this.onChunk = onChunk;
         this.audioContext = null;
         this.source = null;
         this.workletNode = null;
@@ -93,39 +233,42 @@ class AudioRecorder {
     }
 
     async start() {
-        this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        if (this.audioContext && this.audioContext.state !== "closed") return;
+
+        this.stream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+                echoCancellation: true,
+                noiseSuppression: true,
+                autoGainControl: true,
+            },
+        });
         this.audioContext = new AudioContext({ sampleRate: 16000 });
-        await this.audioContext.audioWorklet.addModule('audio-processor.js');
-        this.workletNode = new AudioWorkletNode(this.audioContext, 'audio-processor');
-        
-        this.workletNode.port.onmessage = (event) => {
-            // Convert ArrayBuffer to Base64 string
-            const base64String = btoa(String.fromCharCode(...new Uint8Array(event.data)));
-            
-            // Format for Gemini Live API according to the official docs
-            const message = { 
-                realtimeInput: { 
-                    mediaChunks: [{ 
-                        mime_type: "audio/pcm", 
-                        data: base64String 
-                    }] 
-                } 
-            };
-            
-            if (ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify(message));
-            }
-        };
-        
+        await this.audioContext.audioWorklet.addModule("audio-processor.js");
+        this.workletNode = new AudioWorkletNode(this.audioContext, "audio-processor");
+        this.workletNode.port.onmessage = (event) => this.onChunk(event.data);
         this.source = this.audioContext.createMediaStreamSource(this.stream);
         this.source.connect(this.workletNode);
+        this.isMuted = false;
+    }
+
+    async resume() {
+        if (this.audioContext?.state === "suspended") {
+            await this.audioContext.resume();
+        }
     }
 
     stop() {
-        this.stream?.getTracks().forEach(track => track.stop());
-        if (this.audioContext && this.audioContext.state !== 'closed') {
-            this.audioContext.close();
+        safeDisconnect(this.source);
+        safeDisconnect(this.workletNode);
+        this.stream?.getTracks().forEach((track) => track.stop());
+        if (this.audioContext && this.audioContext.state !== "closed") {
+            void this.audioContext.close();
         }
+        this.audioContext = null;
+        this.source = null;
+        this.workletNode = null;
+        this.stream = null;
+        this.isMuted = false;
     }
 
     mute() {
@@ -143,45 +286,21 @@ class AudioRecorder {
     }
 }
 
-const recorder = new AudioRecorder();
-
-// --- UI Event Listener ---
-micButton.addEventListener('click', async () => {
-    if (ws.readyState !== WebSocket.OPEN) {
-        statusElement.textContent = 'WebSocket not connected. Please wait or refresh.';
-        return;
+function safeDisconnect(node) {
+    try {
+        node?.disconnect();
+    } catch {
+        // A muted recorder may already be disconnected when the session ends.
     }
+}
 
-    if (!isSessionActive) {
-        // First click: start the session
-        statusElement.textContent = 'Starting microphone...';
-        try {
-            await recorder.start();
-
-            isSessionActive = true;
-            isMicMuted = false;
-            micButton.textContent = 'Mute Mic';
-            micButton.classList.add('hot');
-            statusElement.textContent = 'Listening...';
-
-        } catch (error) {
-            console.error("Error starting microphone:", error);
-            statusElement.textContent = "Could not start microphone.";
-        }
-        
-    } else {
-        // Subsequent clicks: toggle mute
-        if (isMicMuted) {
-            recorder.unmute();
-            micButton.textContent = 'Mute Mic';
-            micButton.classList.add('hot');
-            statusElement.textContent = 'Listening...';
-        } else {
-            recorder.mute();
-            micButton.textContent = 'Unmute Mic';
-            micButton.classList.remove('hot');
-            statusElement.textContent = 'Mic muted.';
-        }
-        isMicMuted = !isMicMuted;
-    }
+recorder = new AudioRecorder({
+    onChunk: (buffer) => {
+        if (socket?.readyState !== WebSocket.OPEN || !isSessionActive || isMicMuted) return;
+        socket.send(JSON.stringify({
+            type: "audio",
+            mime_type: "audio/pcm;rate=16000",
+            data: arrayBufferToBase64(buffer),
+        }));
+    },
 });
