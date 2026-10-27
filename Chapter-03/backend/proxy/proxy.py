@@ -118,9 +118,9 @@ async def forward_browser_payload(payload: dict[str, Any], live_session: Any) ->
             )
         )
     elif msg_type == "activity_start":
-        await live_session.send_realtime_input(activity_start=types.ActivityStart())
+        pass  # Local microphone state; automatic VAD detects speech.
     elif msg_type == "activity_end":
-        await live_session.send_realtime_input(activity_end=types.ActivityEnd())
+        await live_session.send_realtime_input(audio_stream_end=True)
     elif msg_type == "close":
         return True
     else:
